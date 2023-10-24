@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 # Load the video with the green screen
-video_capture = cv2.VideoCapture('video_with_green_screen.mp4')
+video_capture = cv2.VideoCapture('video_with_zoom_green_screen.mp4')
 
 # Create an output video writer with transparency support
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
