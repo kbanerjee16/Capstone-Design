@@ -1,3 +1,6 @@
+#crops black pixels as it turns the green screen background black, but there is a problem with it
+#repeats the video which is good
+
 import cv2
 import numpy as np
 
@@ -13,7 +16,7 @@ upper_green = np.array([85, 255, 255])
 frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))
 
-# Define the codec and create a VideoWriter to save the output video with a black background
+# Create a VideoWriter to save the cropped video
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
 output_video = 'output_video.avi'
 out = cv2.VideoWriter(output_video, fourcc, 30, (frame_width, frame_height), isColor=True)
@@ -32,23 +35,32 @@ while True:
     # Invert the mask (black-out the green screen)
     mask_inv = cv2.bitwise_not(mask)
 
-    # Create a solid black background
-    black_background = np.zeros_like(frame)
+    # Crop out the black pixels
+    result = cv2.bitwise_and(frame, frame, mask=mask_inv)
 
-    # Extract the subject (foreground) from the frame
-    subject = cv2.bitwise_and(frame, frame, mask=mask_inv)
-
-    # Combine the subject with the black background
-    result = cv2.add(subject, black_background)
-
-    # Write the frame with a black background to the output video
+    # Write the cropped frame to the output video
     out.write(result)
 
-    cv2.imshow('Green Screen Removal', result)
+    cv2.imshow('Cropped Video', result)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cap.release()
 out.release()
+
+# Open the cropped video for playing
+output_cap = cv2.VideoCapture(output_video)
+
+while True:
+    ret, frame = output_cap.read()
+    if not ret:
+        break
+
+    cv2.imshow('Cropped Video', frame)
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+output_cap.release()
 cv2.destroyAllWindows()
