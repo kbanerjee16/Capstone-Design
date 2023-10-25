@@ -1,44 +1,41 @@
 import cv2
 import numpy as np
 
-# Load the video with the green screen
-video_capture = cv2.VideoCapture('video_with_zoom_green_screen.mp4')
+# Load the video file
+input_video = 'video_with_zoom_green_screen.mp4'
+cap = cv2.VideoCapture(input_video)
 
-# Create an output MP4 video writer with transparency support
-fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Use 'mp4v' for MP4 format
-output = cv2.VideoWriter('no_background_video.mp4', fourcc, 30, (640, 480), isColor=False)
+# Define the lower and upper bounds for the green screen color (in HSV format)
+lower_green = np.array([35, 100, 100])
+upper_green = np.array([85, 255, 255])
 
 while True:
-    ret, frame = video_capture.read()
+    ret, frame = cap.read()
     if not ret:
         break
 
-    # Convert frame to HSV color space
-    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+    # Convert the frame to the HSV color space
+    hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # Define the color range for green in HSV format
-    lower_green = np.array([35, 80, 80])
-    upper_green = np.array([85, 255, 255])
+    # Create a mask to identify the green screen area
+    mask = cv2.inRange(hsv_frame, lower_green, upper_green)
 
-    # Create a mask that isolates the green color
-    mask = cv2.inRange(hsv, lower_green, upper_green)
-
-    # Invert the mask to select the non-green pixels
+    # Invert the mask (black-out the green screen)
     mask_inv = cv2.bitwise_not(mask)
 
-    # Extract the subject from the frame
+    # Create a solid black background
+    black_background = np.zeros_like(frame)
+
+    # Extract the subject (foreground) from the frame
     subject = cv2.bitwise_and(frame, frame, mask=mask_inv)
 
-    # Set the green screen background to transparent
-    frame[np.where(mask > 0)] = [0, 0, 0]
+    # Combine the subject with the black background
+    result = cv2.add(subject, black_background)
 
-    # Write the frame to the output video
-    output.write(frame)
+    cv2.imshow('Green Screen Removal', result)
 
-    cv2.imshow('Green Screen Removal', frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-video_capture.release()
-output.release()
+cap.release()
 cv2.destroyAllWindows()
