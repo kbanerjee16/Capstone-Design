@@ -9,6 +9,15 @@ cap = cv2.VideoCapture(input_video)
 lower_green = np.array([35, 100, 100])
 upper_green = np.array([85, 255, 255])
 
+# Get video frame dimensions
+frame_width = int(cap.get(3))
+frame_height = int(cap.get(4))
+
+# Define the codec and create a VideoWriter to save the output video with a black background
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+output_video = 'output_video.avi'
+out = cv2.VideoWriter(output_video, fourcc, 30, (frame_width, frame_height), isColor=True)
+
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -32,10 +41,14 @@ while True:
     # Combine the subject with the black background
     result = cv2.add(subject, black_background)
 
+    # Write the frame with a black background to the output video
+    out.write(result)
+
     cv2.imshow('Green Screen Removal', result)
 
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
 cap.release()
+out.release()
 cv2.destroyAllWindows()
