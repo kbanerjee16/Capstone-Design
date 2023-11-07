@@ -2,7 +2,7 @@
 #press 0 to move to next frame
 import cv2
 
-video = cv2.VideoCapture('original.mp4')
+video = cv2.VideoCapture('output_video.avi')#something is wrong with the output video
 
 frames = video.get(cv2.CAP_PROP_FRAME_COUNT)#it's giving me too many frames
 print('total frames = ', frames)
