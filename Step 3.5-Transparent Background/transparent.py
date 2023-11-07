@@ -3,7 +3,7 @@
 import cv2
 
 #load image onto opencv
-file_name = "gfgblack.png"
+file_name = "my_video_frame.png"
 
 #read image
 src = cv2.imread(file_name, 1)
