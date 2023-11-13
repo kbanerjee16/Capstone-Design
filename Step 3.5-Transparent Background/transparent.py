@@ -27,4 +27,4 @@ rgba = [b, g, r, alpha]
 dst = cv2.merge(rgba, 4) 
   
 # Writing and saving to a new image 
-cv2.imwrite("gfg_white.png", dst) 
+cv2.imwrite("no_background_frame.png", dst) 
